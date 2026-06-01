@@ -1,3 +1,8 @@
+## 0.2.4
+
+* Support AGP 9.
+* Migrate Android build files to .kts
+
 ## 0.2.3
 
 * Fix AVAudioSession() method handler throwing when arguments is null (@snipd-mikel).
