@@ -1,25 +1,20 @@
 plugins {
-    id "com.android.application"
-    id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
-    id "dev.flutter.flutter-gradle-plugin"
+    id("com.android.application")
+    // The Flutter Gradle Plugin must be applied after the Android Gradle plugin.
+    id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
     namespace = "com.ryanheise.audio_session_example"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     lint {
-        disable = ["InvalidPackage"]
+        disable.addAll(setOf("InvalidPackage"))
     }
 
     defaultConfig {
@@ -35,15 +30,21 @@ android {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+            signingConfig = signingConfigs.getByName("debug")
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
 
 flutter {
     source = "../.."
 }
-// 
+
 // dependencies {
 //     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
 // }

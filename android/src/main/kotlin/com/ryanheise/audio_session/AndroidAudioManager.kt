@@ -374,12 +374,14 @@ private class AudioManagerSingleton(applicationContext: Context) {
         if (applicationContext == null) return false
         unregisterNoisyReceiver()
         unregisterScoReceiver()
+        
+        val audioFocusRequest = audioFocusRequest
         if (audioFocusRequest == null) {
             return true
         } else {
             val status: Int =
-                AudioManagerCompat.abandonAudioFocusRequest(audioManager!!, audioFocusRequest!!)
-            audioFocusRequest = null
+                AudioManagerCompat.abandonAudioFocusRequest(audioManager!!, audioFocusRequest)
+            this.audioFocusRequest = null
             return status == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
         }
     }
