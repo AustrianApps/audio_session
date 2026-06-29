@@ -31,7 +31,7 @@ if (agpMajor < 9) {
 }
 
 android {
-    namespace = "com.ryanheise.flutter_plugin"
+    namespace = "com.ryanheise.audio_session"
     compileSdk = 35
 
     defaultConfig {
