@@ -213,6 +213,14 @@ class AudioSession {
     }
   }
 
+  Future<void> setPreferredIOBufferDuration(double duration) async {
+    await _avAudioSession?.setPreferredIOBufferDuration(duration);
+  }
+
+  Future<Duration?> getInputLatency() async {
+    return _avAudioSession?.inputLatency;
+  }
+
   /// Activates or deactivates this audio session. Typically an audio plugin
   /// should call this method when it begins playing audio. If the audio
   /// session is not yet configured at the time this is called, the
