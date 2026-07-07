@@ -94,6 +94,8 @@ static NSHashTable<DarwinAudioSession *> *sessions = nil;
         [self getInputGain:args result:result];
     } else if ([@"setInputGain" isEqualToString:call.method]) {
         [self setInputGain:args result:result];
+    } else if ([@"setPreferredIOBufferDuration" isEqualToString:call.method]) {
+        [self setPreferredIOBufferDuration:args result:result];
     } else if ([@"isInputGainSettable" isEqualToString:call.method]) {
         [self getIsInputGainSettable:args result:result];
     }
@@ -534,6 +536,16 @@ static NSHashTable<DarwinAudioSession *> *sessions = nil;
 - (void)getIsInputGainSettable:(NSArray *)args result:(FlutterResult)result {
     if (@available(iOS 6.0, *)) {
         result(@([[AVAudioSession sharedInstance] isInputGainSettable]));
+    } else {
+        result(nil);
+    }
+}
+
+- (void)setPreferredIOBufferDuration:(NSArray *)args result:(FlutterResult)result {
+    if (@available(iOS 6.0, *)) {
+        NSError *error = nil;
+        NSNumber *durationValue = (NSNumber *)args[0];
+        result(@([[AVAudioSession sharedInstance] setPreferredIOBufferDuration:durationValue.floatValue error:&error]));
     } else {
         result(nil);
     }

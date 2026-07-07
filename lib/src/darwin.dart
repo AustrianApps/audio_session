@@ -9,8 +9,9 @@ import 'package:rxdart/rxdart.dart';
 /// If you test any feature listed as UNTESTED, consider sharing whether it
 /// works on GitHub.
 class AVAudioSession {
-  static const MethodChannel _channel =
-      MethodChannel('com.ryanheise.av_audio_session');
+  static const MethodChannel _channel = MethodChannel(
+    'com.ryanheise.av_audio_session',
+  );
   static AVAudioSession? _instance;
 
   final _interruptionNotificationSubject =
@@ -33,27 +34,36 @@ class AVAudioSession {
       final args = call.arguments as List<dynamic>?;
       switch (call.method) {
         case 'onInterruptionEvent':
-          _interruptionNotificationSubject
-              .add(AVAudioSessionInterruptionNotification(
-            type: decodeEnum(
-                AVAudioSessionInterruptionType.values, args![0] as int?,
-                defaultValue: AVAudioSessionInterruptionType.began),
-            options: AVAudioSessionInterruptionOptions(args[1] as int),
-            wasSuspended: args[2] as bool?,
-          ));
+          _interruptionNotificationSubject.add(
+            AVAudioSessionInterruptionNotification(
+              type: decodeEnum(
+                AVAudioSessionInterruptionType.values,
+                args![0] as int?,
+                defaultValue: AVAudioSessionInterruptionType.began,
+              ),
+              options: AVAudioSessionInterruptionOptions(args[1] as int),
+              wasSuspended: args[2] as bool?,
+            ),
+          );
           break;
         case 'onRouteChange':
           AVAudioSessionRouteChange routeChange = AVAudioSessionRouteChange(
-              reason: decodeEnum(
-                  AVAudioSessionRouteChangeReason.values, args![0] as int?,
-                  defaultValue: AVAudioSessionRouteChangeReason.unknown));
+            reason: decodeEnum(
+              AVAudioSessionRouteChangeReason.values,
+              args![0] as int?,
+              defaultValue: AVAudioSessionRouteChangeReason.unknown,
+            ),
+          );
           _routeChangeSubject.add(routeChange);
           break;
         case 'onSilenceSecondaryAudioHint':
-          _silenceSecondaryAudioHintSubject.add(decodeEnum(
+          _silenceSecondaryAudioHintSubject.add(
+            decodeEnum(
               AVAudioSessionSilenceSecondaryAudioHintType.values,
               args![0] as int?,
-              defaultValue: AVAudioSessionSilenceSecondaryAudioHintType.begin));
+              defaultValue: AVAudioSessionSilenceSecondaryAudioHintType.begin,
+            ),
+          );
           break;
         case 'onMediaServicesWereLost':
           _mediaServicesWereLostSubject.add(null);
@@ -87,8 +97,10 @@ class AVAudioSession {
 
   /// (UNTESTED)
   Future<AVAudioSessionCategory> get category async {
-    final rawCategory =
-        (await (_channel.invokeMethod<String>('getCategory', <dynamic>[])))!;
+    final rawCategory = (await (_channel.invokeMethod<String>(
+      'getCategory',
+      <dynamic>[],
+    )))!;
     return AVAudioSessionCategory.fromRawValue(rawCategory);
   }
 
@@ -98,29 +110,40 @@ class AVAudioSession {
     AVAudioSessionMode? mode,
     AVAudioSessionRouteSharingPolicy? policy,
   ]) =>
-      _channel.invokeMethod('setCategory',
-          [category?.rawValue, options?.value, mode?.index, policy?.index]);
+      _channel.invokeMethod('setCategory', [
+        category?.rawValue,
+        options?.value,
+        mode?.index,
+        policy?.index,
+      ]);
 
   /// (UNTESTED)
   Future<List<AVAudioSessionCategory>> get availableCategories async =>
       (await _channel.invokeMethod<List<dynamic>>(
-              'getAvailableCategories', <dynamic>[]))!
+        'getAvailableCategories',
+        <dynamic>[],
+      ))!
           .cast<String>()
           .map((rawValue) => AVAudioSessionCategory.fromRawValue(rawValue))
           .toList();
 
   /// (UNTESTED)
   Future<AVAudioSessionCategoryOptions> get categoryOptions async {
-    final value = (await (_channel
-        .invokeMethod<int>('getCategoryOptions', <dynamic>[])))!;
+    final value = (await (_channel.invokeMethod<int>(
+      'getCategoryOptions',
+      <dynamic>[],
+    )))!;
     return AVAudioSessionCategoryOptions(value);
   }
 
   /// (UNTESTED)
   Future<AVAudioSessionMode> get mode async {
     final index = (await (_channel.invokeMethod<int>('getMode', <dynamic>[])))!;
-    return decodeEnum(AVAudioSessionMode.values, index,
-        defaultValue: AVAudioSessionMode.defaultMode);
+    return decodeEnum(
+      AVAudioSessionMode.values,
+      index,
+      defaultValue: AVAudioSessionMode.defaultMode,
+    );
   }
 
   /// (UNTESTED)
@@ -130,9 +153,16 @@ class AVAudioSession {
   /// (UNTESTED)
   Future<List<AVAudioSessionMode>> get availableModes async =>
       (await _channel.invokeMethod<List<AVAudioSessionMode>>(
-              'getAvailableModes', <dynamic>[]))!
-          .map((index) => decodeEnum(AVAudioSessionMode.values, index as int,
-              defaultValue: AVAudioSessionMode.defaultMode))
+        'getAvailableModes',
+        <dynamic>[],
+      ))!
+          .map(
+            (index) => decodeEnum(
+              AVAudioSessionMode.values,
+              index as int,
+              defaultValue: AVAudioSessionMode.defaultMode,
+            ),
+          )
           .toList();
 
   /// (UNTESTED)
@@ -140,25 +170,39 @@ class AVAudioSession {
     // TODO: Use this code without the '?' once a Dart bug is fixed.
     // (similar instances occur elsewhere)
     // final index = await _channel.invokeMethod<int>('getRouteSharingPolicy', <dynamic>[]);
-    final index =
-        await _channel.invokeMethod<int?>('getRouteSharingPolicy', <dynamic>[]);
+    final index = await _channel.invokeMethod<int?>(
+      'getRouteSharingPolicy',
+      <dynamic>[],
+    );
     return index == null
         ? null
-        : decodeEnum(AVAudioSessionRouteSharingPolicy.values, index,
-            defaultValue: AVAudioSessionRouteSharingPolicy.defaultPolicy);
+        : decodeEnum(
+            AVAudioSessionRouteSharingPolicy.values,
+            index,
+            defaultValue: AVAudioSessionRouteSharingPolicy.defaultPolicy,
+          );
   }
 
-  Future<bool> setActive(bool active,
-          {AVAudioSessionSetActiveOptions? avOptions}) async =>
-      (await _channel
-          .invokeMethod<bool>('setActive', [active, avOptions?.value]))!;
+  Future<bool> setActive(
+    bool active, {
+    AVAudioSessionSetActiveOptions? avOptions,
+  }) async =>
+      (await _channel.invokeMethod<bool>('setActive', [
+        active,
+        avOptions?.value,
+      ]))!;
 
   /// (UNTESTED)
   Future<AVAudioSessionRecordPermission> get recordPermission async {
-    final index = (await (_channel
-        .invokeMethod<int>('getRecordPermission', <dynamic>[])))!;
-    return decodeEnum(AVAudioSessionRecordPermission.values, index,
-        defaultValue: AVAudioSessionRecordPermission.undetermined);
+    final index = (await (_channel.invokeMethod<int>(
+      'getRecordPermission',
+      <dynamic>[],
+    )))!;
+    return decodeEnum(
+      AVAudioSessionRecordPermission.values,
+      index,
+      defaultValue: AVAudioSessionRecordPermission.undetermined,
+    );
   }
 
   /// (UNTESTED)
@@ -170,52 +214,75 @@ class AVAudioSession {
 
   Future<bool> get secondaryAudioShouldBeSilencedHint async =>
       (await _channel.invokeMethod<bool>(
-          'getSecondaryAudioShouldBeSilencedHint', <dynamic>[]))!;
+        'getSecondaryAudioShouldBeSilencedHint',
+        <dynamic>[],
+      ))!;
 
   Future<bool> get prefersNoInterruptionsFromSystemAlerts async =>
       (await _channel.invokeMethod<bool>(
-          'getPrefersNoInterruptionsFromSystemAlerts', <dynamic>[]))!;
+        'getPrefersNoInterruptionsFromSystemAlerts',
+        <dynamic>[],
+      ))!;
 
   Future<void> setPrefersNoInterruptionsFromSystemAlerts(
-          bool noInterruptions) =>
-      _channel.invokeMethod(
-          'setPrefersNoInterruptionsFromSystemAlerts', [noInterruptions]);
+    bool noInterruptions,
+  ) =>
+      _channel.invokeMethod('setPrefersNoInterruptionsFromSystemAlerts', [
+        noInterruptions,
+      ]);
 
   /// (UNTESTED)
   Future<bool> get allowHapticsAndSystemSoundsDuringRecording async =>
       (await _channel.invokeMethod<bool>(
-          'getAllowHapticsAndSystemSoundsDuringRecording', <dynamic>[]))!;
+        'getAllowHapticsAndSystemSoundsDuringRecording',
+        <dynamic>[],
+      ))!;
 
   /// (UNTESTED)
   Future<void> setAllowHapticsAndSystemSoundsDuringRecording(bool allow) =>
-      _channel.invokeMethod(
-          'setAllowHapticsAndSystemSoundsDuringRecording', [allow]);
+      _channel.invokeMethod('setAllowHapticsAndSystemSoundsDuringRecording', [
+        allow,
+      ]);
 
   /// (UNTESTED)
   Future<AVAudioSessionPromptStyle?> get promptStyle async {
     // TODO: Use this code without the '?' once a Dart bug is fixed.
     // (similar instances occur elsewhere)
     // final index = await _channel.invokeMethod<int>('getPromptStyle', <dynamic>[]);
-    final index =
-        await _channel.invokeMethod<int?>('getPromptStyle', <dynamic>[]);
+    final index = await _channel.invokeMethod<int?>(
+      'getPromptStyle',
+      <dynamic>[],
+    );
     return index == null
         ? null
-        : decodeEnum(AVAudioSessionPromptStyle.values, index,
-            defaultValue: AVAudioSessionPromptStyle.none);
+        : decodeEnum(
+            AVAudioSessionPromptStyle.values,
+            index,
+            defaultValue: AVAudioSessionPromptStyle.none,
+          );
   }
 
   Future<AVAudioSessionRouteDescription> get currentRoute async {
     return AVAudioSessionRouteDescription._fromMap(
-        _channel,
-        (await _channel.invokeMapMethod<String, dynamic>(
-            'getCurrentRoute', <dynamic>[]))!);
+      _channel,
+      (await _channel.invokeMapMethod<String, dynamic>(
+        'getCurrentRoute',
+        <dynamic>[],
+      ))!,
+    );
   }
 
   Future<Set<AVAudioSessionPortDescription>> get availableInputs async {
-    return (await _channel
-            .invokeListMethod<dynamic>('getAvailableInputs', <dynamic>[]))!
-        .map((dynamic raw) => AVAudioSessionPortDescription._fromMap(
-            _channel, (raw as Map<dynamic, dynamic>).cast<String, dynamic>()))
+    return (await _channel.invokeListMethod<dynamic>(
+      'getAvailableInputs',
+      <dynamic>[],
+    ))!
+        .map(
+          (dynamic raw) => AVAudioSessionPortDescription._fromMap(
+            _channel,
+            (raw as Map<dynamic, dynamic>).cast<String, dynamic>(),
+          ),
+        )
         .toSet();
   }
 
@@ -252,7 +319,8 @@ class AVAudioSession {
 
   /// (UNTESTED)
   Future<void> overrideOutputAudioPort(
-          AVAudioSessionPortOverride portOverride) =>
+    AVAudioSessionPortOverride portOverride,
+  ) =>
       _channel.invokeMethod('overrideOutputAudioPort', [portOverride.index]);
 
   //Future<AVPreparePlaybackRouteResult>
@@ -304,12 +372,19 @@ class AVAudioSession {
       (await _channel.invokeMethod<double>('getInputGain', <dynamic>[]));
 
   Future<bool?> get inputGainSettable async {
-    return await _channel
-        .invokeMethod<bool>('isInputGainSettable', <dynamic>[]);
+    return await _channel.invokeMethod<bool>(
+      'isInputGainSettable',
+      <dynamic>[],
+    );
   }
 
   Future<bool?> setInputGain(double gain) async {
     return await _channel.invokeMethod('setInputGain', [gain]);
+  }
+
+  Future<bool?> setPreferredIOBufferDuration(double duration) async {
+    return await _channel
+        .invokeMethod('setPreferredIOBufferDuration', [duration]);
   }
 
   //Future<double> get outputVolume async {
@@ -329,15 +404,21 @@ class AVAudioSession {
   /// (UNTESTED)
   Future<Duration> get inputLatency async {
     return Duration(
-        microseconds: (await _channel
-            .invokeMethod<int>('getInputLatency', <dynamic>[]))!);
+      microseconds: (await _channel.invokeMethod<int>(
+        'getInputLatency',
+        <dynamic>[],
+      ))!,
+    );
   }
 
   /// (UNTESTED)
   Future<Duration> get outputLatency async {
     return Duration(
-        microseconds: (await _channel
-            .invokeMethod<int>('getOutputLatency', <dynamic>[]))!);
+      microseconds: (await _channel.invokeMethod<int>(
+        'getOutputLatency',
+        <dynamic>[],
+      ))!,
+    );
   }
 
   //Future<Duration> get ioBufferDuration async {
@@ -410,11 +491,13 @@ class AVAudioSessionCategoryOptions {
   const AVAudioSessionCategoryOptions(this.value);
 
   AVAudioSessionCategoryOptions operator |(
-          AVAudioSessionCategoryOptions option) =>
+    AVAudioSessionCategoryOptions option,
+  ) =>
       AVAudioSessionCategoryOptions(value | option.value);
 
   AVAudioSessionCategoryOptions operator &(
-          AVAudioSessionCategoryOptions option) =>
+    AVAudioSessionCategoryOptions option,
+  ) =>
       AVAudioSessionCategoryOptions(value & option.value);
 
   bool contains(AVAudioSessionCategoryOptions options) =>
@@ -461,11 +544,13 @@ class AVAudioSessionSetActiveOptions {
   const AVAudioSessionSetActiveOptions(this.value);
 
   AVAudioSessionSetActiveOptions operator |(
-          AVAudioSessionSetActiveOptions option) =>
+    AVAudioSessionSetActiveOptions option,
+  ) =>
       AVAudioSessionSetActiveOptions(value | option.value);
 
   AVAudioSessionSetActiveOptions operator &(
-          AVAudioSessionSetActiveOptions option) =>
+    AVAudioSessionSetActiveOptions option,
+  ) =>
       AVAudioSessionSetActiveOptions(value & option.value);
 
   bool contains(AVAudioSessionSetActiveOptions options) =>
@@ -515,11 +600,13 @@ class AVAudioSessionInterruptionOptions {
   const AVAudioSessionInterruptionOptions(this.value);
 
   AVAudioSessionInterruptionOptions operator |(
-          AVAudioSessionInterruptionOptions option) =>
+    AVAudioSessionInterruptionOptions option,
+  ) =>
       AVAudioSessionInterruptionOptions(value | option.value);
 
   AVAudioSessionInterruptionOptions operator &(
-          AVAudioSessionInterruptionOptions option) =>
+    AVAudioSessionInterruptionOptions option,
+  ) =>
       AVAudioSessionInterruptionOptions(value & option.value);
 
   bool contains(AVAudioSessionInterruptionOptions options) =>
@@ -565,15 +652,25 @@ class AVAudioSessionRouteDescription {
 
   AVAudioSessionRouteDescription({required this.inputs, required this.outputs});
   static AVAudioSessionRouteDescription _fromMap(
-          MethodChannel channel, Map<String, dynamic> map) =>
+    MethodChannel channel,
+    Map<String, dynamic> map,
+  ) =>
       AVAudioSessionRouteDescription(
         inputs: (map['inputs'] as List<dynamic>)
-            .map((raw) => AVAudioSessionPortDescription._fromMap(channel,
-                (raw as Map<dynamic, dynamic>).cast<String, dynamic>()))
+            .map(
+              (raw) => AVAudioSessionPortDescription._fromMap(
+                channel,
+                (raw as Map<dynamic, dynamic>).cast<String, dynamic>(),
+              ),
+            )
             .toSet(),
         outputs: (map['outputs'] as List<dynamic>)
-            .map((raw) => AVAudioSessionPortDescription._fromMap(channel,
-                (raw as Map<dynamic, dynamic>).cast<String, dynamic>()))
+            .map(
+              (raw) => AVAudioSessionPortDescription._fromMap(
+                channel,
+                (raw as Map<dynamic, dynamic>).cast<String, dynamic>(),
+              ),
+            )
             .toSet(),
       );
 }
@@ -618,32 +715,43 @@ class AVAudioSessionPortDescription {
   //}
 
   static AVAudioSessionPortDescription _fromMap(
-          MethodChannel channel, Map<String, dynamic> map) =>
+    MethodChannel channel,
+    Map<String, dynamic> map,
+  ) =>
       AVAudioSessionPortDescription(
         channel: channel,
         portName: map['portName'] as String,
-        portType: decodeEnum(AVAudioSessionPort.values, map['portType'] as int?,
-            defaultValue: AVAudioSessionPort.builtInMic),
+        portType: decodeEnum(
+          AVAudioSessionPort.values,
+          map['portType'] as int?,
+          defaultValue: AVAudioSessionPort.builtInMic,
+        ),
         channels: [],
         uid: map['uid'] as String,
         hasHardwareVoiceCallProcessing:
             map['hasHardwareVoiceCallProcessing'] as bool,
         dataSources: (map['dataSources'] as List<dynamic>?)
-            ?.map((raw) => AVAudioSessionDataSourceDescription._fromMap(channel,
-                (raw as Map<dynamic, dynamic>).cast<String, dynamic>()))
+            ?.map(
+              (raw) => AVAudioSessionDataSourceDescription._fromMap(
+                channel,
+                (raw as Map<dynamic, dynamic>).cast<String, dynamic>(),
+              ),
+            )
             .toList(),
         selectedDataSource: map['selectedDataSource'] == null
             ? null
             : AVAudioSessionDataSourceDescription._fromMap(
                 channel,
                 (map['selectedDataSource'] as Map<dynamic, dynamic>)
-                    .cast<String, dynamic>()),
+                    .cast<String, dynamic>(),
+              ),
         preferredDataSource: map['preferredDataSource'] == null
             ? null
             : AVAudioSessionDataSourceDescription._fromMap(
                 channel,
                 (map['preferredDataSource'] as Map<dynamic, dynamic>)
-                    .cast<String, dynamic>()),
+                    .cast<String, dynamic>(),
+              ),
       );
 
   Map<String, dynamic> _toMap() => {
@@ -746,36 +854,51 @@ class AVAudioSessionDataSourceDescription {
   //}
 
   static AVAudioSessionDataSourceDescription _fromMap(
-          MethodChannel channel, Map<String, dynamic> map) =>
+    MethodChannel channel,
+    Map<String, dynamic> map,
+  ) =>
       AVAudioSessionDataSourceDescription(
         channel: channel,
         id: map['id'] as int,
         name: map['name'] as String,
         location: map['location'] == null
             ? null
-            : decodeEnum(AVAudioSessionLocation.values, map['location'] as int?,
-                defaultValue: AVAudioSessionLocation.lower),
+            : decodeEnum(
+                AVAudioSessionLocation.values,
+                map['location'] as int?,
+                defaultValue: AVAudioSessionLocation.lower,
+              ),
         orientation: map['orientation'] == null
             ? null
             : decodeEnum(
-                AVAudioSessionOrientation.values, map['orientation'] as int?,
-                defaultValue: AVAudioSessionOrientation.top),
+                AVAudioSessionOrientation.values,
+                map['orientation'] as int?,
+                defaultValue: AVAudioSessionOrientation.top,
+              ),
         selectedPolarPattern: map['selectedPolarPattern'] == null
             ? null
-            : decodeEnum(AVAudioSessionPolarPattern.values,
+            : decodeEnum(
+                AVAudioSessionPolarPattern.values,
                 map['selectedPolarPattern'] as int?,
-                defaultValue: AVAudioSessionPolarPattern.stereo),
+                defaultValue: AVAudioSessionPolarPattern.stereo,
+              ),
         supportedPolarPatterns:
             (map['supportedPolarPatterns'] as List<dynamic>?)
-                ?.map((index) => decodeEnum(
-                    AVAudioSessionPolarPattern.values, index as int?,
-                    defaultValue: AVAudioSessionPolarPattern.stereo))
+                ?.map(
+                  (index) => decodeEnum(
+                    AVAudioSessionPolarPattern.values,
+                    index as int?,
+                    defaultValue: AVAudioSessionPolarPattern.stereo,
+                  ),
+                )
                 .toList(),
         preferredPolarPattern: map['preferredPolarPattern'] == null
             ? null
-            : decodeEnum(AVAudioSessionPolarPattern.values,
+            : decodeEnum(
+                AVAudioSessionPolarPattern.values,
                 map['preferredPolarPattern'] as int?,
-                defaultValue: AVAudioSessionPolarPattern.stereo),
+                defaultValue: AVAudioSessionPolarPattern.stereo,
+              ),
       );
 
   Map<String, dynamic> _toMap() => {
