@@ -217,8 +217,8 @@ class AudioSession {
     await _avAudioSession?.setPreferredIOBufferDuration(duration);
   }
 
-  Future<Duration?> getInputLatency() async {
-    return _avAudioSession?.inputLatency;
+  Future<Duration?> getOutputLatency() async {
+    return _avAudioSession?.outputLatency;
   }
 
   /// Activates or deactivates this audio session. Typically an audio plugin
